@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{
+    background-image: url("picsariel/bisous.jpg");
+
+    }
+.flip3D > div{
+    border: solid black 1px;
+    float: left;
+    margin:10px;
+    cursor:pointer;
+    text-align:center;
+    width: 200px;
+    height: 200px;
+    }
+.flip3D{
+    width: 200px;
+    height: 200px;
+    margin:10px;
+    float:left;
+    }
+.flip3D > .front{
+	position:absolute;
+	-webkit-transform: perspective( 600px ) rotateY( 0deg );
+	transform: perspective( 600px ) rotateY( 0deg );
+	border-radius: 7px;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	transition: -webkit-transform .5s linear 0s;
+	transition: transform .5s linear 0s;
+	background-size: cover;
+}
+.flip3D > .back{
+	position:absolute;
+	-webkit-transform: perspective( 600px ) rotateY( 180deg );
+	transform: perspective( 600px ) rotateY( 180deg );
+	border-radius: 7px;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	transition: -webkit-transform .5s linear 0s;
+	transition: transform .5s linear 0s;
+	background-size: cover;
+}
+.flip3D.clip > .front{
+	-webkit-transform: perspective( 600px ) rotateY( -180deg );
+	transform: perspective( 600px ) rotateY( -180deg );
+}
+.flip3D.clip > .back{
+	-webkit-transform: perspective( 600px ) rotateY( 0deg );
+	transform: perspective( 600px ) rotateY( 0deg );
+}
+
+@media screen and (max-width: 600px) {
+  .flip3D, .flip3D > div{
+       width:100px;
+       height:100px;
+    }
+  }
+
+
+</style>
+</head>
+<body>
+<h1>My memory game</h1>
+<button type="button" onclick="newBoard()">New game!</button>
+
+
+<div id="board"></div>
+<script>
+//different cards
+//
+    var card_array=['picsariel/1.jpg','picsariel/1.jpg','picsariel/2.jpg','picsariel/2.jpg','picsariel/3.jpg','picsariel/3.jpg','picsariel/4.jpg','picsariel/4.jpg','picsariel/5.jpg','picsariel/5.jpg','picsariel/6.jpg','picsariel/6.jpg'];
+    var cardgame=[];
+    var card_turned=0;
+
+    var card1='';
+    var card2='';
+    var match=0;
+    var canClick = true;
+
+//mix function
+//
+    Array.prototype.values_card_mix = function(){
+        var i = this.length, j, temp;
+        while(--i>0){
+            j= Math.floor(Math.random() * (i+1));
+            temp = this [j];
+            this [j] = this[i];
+            this[i] = temp;
+        }
+    }
+
+// click listener
+//
+
+    function handleCardClick(event) {
+    if(canClick==true){
+        card_turned += 1;
+
+        event.srcElement.parentElement.classList.remove("clip");
+
+        if(card_turned==1){
+            card1=event.srcElement.parentElement;
+        } else if(card_turned==2){
+            canClick=false;
+            card2=event.srcElement.parentElement;
+
+            if(card1.children[1].style.backgroundImage==card2.children[1].style.backgroundImage){
+                match++;
+            } else {
+                setTimeout(function() {
+                    card1.classList.add("clip");
+                    card2.classList.add("clip");
+                }, 1000);
+
+            }
+
+            setTimeout(function() {
+                canClick=true;
+                card_turned=0;
+                card1='';
+                card2='';
+                }, 1000);
+
+             }
+        }
+    }
+
+
+//generating new board
+//
+    function newBoard(){
+        card_turned = 0;
+        cardgame=[];
+        card1=0;
+        card2=0;
+        match=0;
+
+        var board = document.getElementById('board');
+        board.innerHTML="";
+        card_array.values_card_mix();
+
+        for (var i=0 ; i< card_array.length;i++){
+            var flipDiv = document.createElement('div');
+            flipDiv.setAttribute('class', 'flip3D clip');
+            flipDiv.setAttribute('id', 'card' + i);
+
+            var backDiv = document.createElement('div');
+            backDiv.setAttribute('class', 'back');
+            backDiv.style.backgroundImage = 'url("picsariel/back.jpg")';
+
+
+            var frontDiv = document.createElement('div');
+            frontDiv.setAttribute('class', 'front');
+            frontDiv.style.backgroundImage = 'url("' + card_array[i] + '")';
+
+            flipDiv.appendChild(backDiv);
+            flipDiv.appendChild(frontDiv);
+
+            cardgame.push(flipDiv.getAttribute('id'));
+
+            flipDiv.addEventListener("click",function(e){
+                handleCardClick(e);
+
+                if(match==6){
+                alert("You are the best!");
+
+                }
+
+            });
+
+            board.appendChild(flipDiv);
+        }
+
+    }
+
+</script>
+</body>
+</html></html>
